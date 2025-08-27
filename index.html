@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DEVIS Établissements scolaires</title>
+  <style>
+    /* ---- Base & reset doux ---- */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: #111827; background: #fff;
+    }
+
+    /* ---- Containers principaux (mimic noms Webflow) ---- */
+    .div-block-504 { max-width: 980px; margin: 0 auto; padding: 24px 16px; }
+    .devis-form.w-form { width: 100%; }
+    .title-h2.pink.dev {
+      margin: 0 0 12px 0; font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+      color: #ec4899; /* “pink” */
+      text-transform: uppercase;
+    }
+    .div-block-491 { display: flex; align-items: center; gap: 12px; margin: 8px 0 18px; }
+    .button-5.w-button {
+      display: inline-block; background: #111827; color: #fff; text-decoration: none;
+      padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 14px;
+    }
+    .text-block-205 { font-weight: 700; margin-top: 8px; font-size: 18px; }
+
+    /* ---- Form lead ---- */
+    .form-11 { margin-top: 10px; }
+    .form-section-coordonnees { margin-bottom: 18px; }
+    .text-block-192 { font-size: 13px; font-weight: 600; color: #6b7280; margin: 0 0 6px; }
+
+    /* Radios Civilité */
+    .w-radio, .radio-button-field { display: inline-flex; align-items: center; gap: 8px; margin-right: 16px; }
+    .w-form-formradioinput.w-radio-input { width: 16px; height: 16px; }
+
+    /* Grille coordonnées */
+    .tabcoord {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* 2 colonnes */
+      gap: 12px;
+    }
+    @media (max-width: 720px) { .tabcoord { grid-template-columns: 1fr; } }
+
+    .name.w-input {
+      width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;
+    }
+    .name.w-input:focus { outline: none; border-color: #8b5cf6; }
+    .textarea-10.w-input {
+      width: 100%; min-height: 90px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;
+      resize: vertical;
+    }
+
+    /* Type d’établissement */
+    .nometab { margin: 10px 0; }
+    .w-checkbox { display: inline-flex; align-items: center; gap: 8px; margin: 0 12px 8px 0; }
+    .w-checkbox-input { width: 16px; height: 16px; }
+
+    /* ---- Sélection de services (+) ---- */
+    .soustitre { font-size: 14px; color: #6b7280; margin: 6px 0 12px; }
+    .services-picker { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 14px; }
+    .add-service {
+      appearance: none; border: 1px dashed #ec4899; color: #ec4899; background: #fff;
+      padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer;
+    }
+    .add-service:hover { background: #fff0f6; }
+
+    /* ---- Panier ---- */
+    .panier-wrap { margin: 10px 0 18px 0; }
+    .panier-title { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+    .panier-list {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .panier-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 10px; border-radius: 999px;
+      background: #f3f4f6; color: #111827; cursor: pointer; border: 1px solid #e5e7eb;
+      font-size: 13px;
+    }
+    .panier-chip:hover { background: #e5e7eb; }
+
+    /* ---- Unités (formulaires services) ---- */
+    .units-container { display: grid; gap: 14px; margin: 6px 0 14px; }
+    .unit-card {
+      border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px;
+      background: #fff;
+    }
+    .unit-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; }
+    .unit-title { font-weight: 700; font-size: 16px; color: #111827; }
+    .unit-remove {
+      appearance: none; border: 0; background: transparent; color: #ef4444; font-weight: 700; cursor: pointer;
+    }
+
+    .unit-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    @media (max-width: 720px) { .unit-grid { grid-template-columns: 1fr; } }
+
+    .days-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
+    .w-button.submit-button-3.devis {
+      background: #111827; color: #fff; border: 0; padding: 12px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;
+    }
+
+    /* ---- Webflow-like success/fail ---- */
+    .w-form-done, .w-form-fail { display: none; }
+    .w-form-done {
+      margin-top: 14px; padding: 18px; border: 1px solid #a7f3d0; border-radius: 10px; background: #ecfdf5; color: #065f46;
+    }
+    .w-form-fail {
+      margin-top: 14px; padding: 18px; border: 1px solid #fecaca; border-radius: 10px; background: #fef2f2; color: #991b1b;
+    }
+
+    /* ---- (Optionnel) pas de scroll si iFrame ---- */
+    html, body { overflow-x: hidden; }
+  </style>
+</head>
+<body>
+  <div class="div-block-504">
+    <div class="devis-form w-form">
+      <h1 class="title-h2 pink dev">DEVIS ETABLISSEMENTS SCOLAIRES</h1>
+
+      <div class="div-block-491">
+        <a href="/contact" class="button-5 w-button">(Si vous êtes parent, cliquez-ici)</a>
+        <div class="text-block-205">Vos informations</div>
+      </div>
+
+      <form id="wf-form-Formulaire-de-devis-Le-Kompa" name="wf-form-Formulaire-de-devis-Le-Kompa" class="form-11" aria-label="Formulaire de devis Le Kompa">
+        <div class="form-section-coordonnees">
+          <div class="text-block-192">Civilité</div>
+          <label class="radio-button-field w-radio">
+            <input type="radio" name="Civilite" id="Monsieur" value="Monsieur" class="w-form-formradioinput w-radio-input" required>
+            <span class="radio-button-label w-form-label" for="Monsieur">Monsieur</span>
+          </label>
+          <label class="w-radio">
+            <input type="radio" name="Civilite" id="Madame" value="Madame" class="w-form-formradioinput w-radio-input">
+            <span class="radio-button-label-2 w-form-label" for="Madame">Madame</span>
+          </label>
+
+          <div class="tabcoord" style="margin-top:10px;">
+            <div class="prenom">
+              <div class="text-block-192">Prénom</div>
+              <input class="name w-input" maxlength="256" name="Prenom" placeholder="Juliette" type="text" id="Prenom" required>
+            </div>
+            <div class="nom">
+              <div class="text-block-192">Nom</div>
+              <input class="name w-input" maxlength="256" name="Nom" placeholder="Dupont" type="text" id="Nom" required>
+            </div>
+            <div class="email">
+              <div class="text-block-192">Email</div>
+              <input class="name w-input" maxlength="256" name="Email" placeholder="juliette.dupont@gmail.com" type="email" id="Email" required>
+            </div>
+            <div class="telephone">
+              <div class="text-block-192">Téléphone</div>
+              <input class="name w-input" maxlength="256" name="Telephone" placeholder="06 XX XX XX XX" type="tel" id="Telephone" required>
+            </div>
+            <div class="nometab">
+              <div class="text-block-192">Nom de votre établissement</div>
+              <input class="name w-input" maxlength="256" name="Etablissement" placeholder="Nom de l'établissement" type="text" id="Etablissement" required>
+            </div>
+            <div class="nometab">
+              <div class="text-block-192">Code postal</div>
+              <input class="name w-input" maxlength="256" name="CodePostal" placeholder="75XXX" type="text" id="CodePostal" required>
+            </div>
+          </div>
+
+          <div class="nometab" style="margin-top:6px;">
+            <div class="text-block-192">Type d'établissement</div>
+            <label class="w-checkbox"><input type="checkbox" name="TypeEtab" value="Maternelle" class="w-checkbox-input"><span class="checkbox-label w-form-label">Maternelle</span></label>
+            <label class="w-checkbox"><input type="checkbox" name="TypeEtab" value="Primaire" class="w-checkbox-input"><span class="checkbox-label-2 w-form-label">Primaire</span></label>
+            <label class="w-checkbox"><input type="checkbox" name="TypeEtab" value="Collège" class="w-checkbox-input"><span class="checkbox-label-3 w-form-label">Collège</span></label>
+            <label class="w-checkbox"><input type="checkbox" name="TypeEtab" value="Lycée" class="w-checkbox-input"><span class="checkbox-label-4 w-form-label">Lycée</span></label>
+          </div>
+        </div>
+
+        <div class="text-block-205">Quels sont vos besoins ?</div>
+        <div class="soustitre">(Cliquez sur “+” pour ajouter un service ; vous pouvez ajouter plusieurs unités du même service. Supprimez une unité en cliquant dans le “Panier”.)</div>
+
+        <!-- Sélecteur de services -->
+        <div class="services-picker" id="servicesPicker">
+          <!-- Boutons “+ Service” générés par JS selon SERVICES dispo -->
+        </div>
+
+        <!-- Panier (en bas à gauche) -->
+        <div class="panier-wrap">
+          <div class="panier-title">Panier</div>
+          <div class="panier-list" id="panierList"></div>
+        </div>
+
+        <!-- Unités -->
+        <div class="units-container" id="unitsContainer"></div>
+
+        <div class="div-block-508" style="margin-top:12px;">
+          <input type="submit" data-wait="Un instant..." class="submit-button-3 devis w-button" value="Obtenir mon devis">
+        </div>
+      </form>
+
+      <div class="success-message-8 w-form-done" id="formSuccess" role="region" aria-label="success">
+        <div class="text-block-193">Merci !<br>Vous recevrez votre devis personnalisé par e-mail d'ici 24h.</div>
+        <div class="div-block-492"><img src="https://cdn.prod.website-files.com/6828a3a2148c1f250ec250b9/686bea4b3727ea88cc401556_Fichier%2042.svg" loading="lazy" alt="" class="image-344" style="max-width:80px;"></div>
+      </div>
+      <div class="w-form-fail" id="formFail" role="region" aria-label="failure">
+        <div class="text-block-200">Oops, une erreur s'est produite, veuillez réessayer.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========= CONFIG ========= */
+    // Services disponibles dans le picker (“+”)
+    const SERVICES = [
+      { key: "tutorat",     label: "Tutorat" },
+      { key: "surveillance",label: "Surveillance" },
+      { key: "eloquence",   label: "Éloquence" }
+      // -> ajoute ici d'autres services si besoin
+    ];
+
+    // Jours proposés (réutilisés par unité)
+    const JOURS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi"];
+
+    // Webhook Airtable
+    const AIRTABLE_WEBHOOK = "https://hooks.airtable.com/workflows/v1/genericWebhook/appG5KwFRw8KPwyK7/wflpdOyH4RZmtmiRP/wtrfzMfDzszIm5JUh";
+
+    /* ========= LOGIQUE PANIER / UNITÉS ========= */
+    let unitSeq = 0; // ID interne des unités
+    const state = {
+      units: [] // {id, serviceKey, serviceLabel, fields:{creneaux, duree, jours[], commentaires}}
+    };
+
+    const servicesPicker = document.getElementById("servicesPicker");
+    const panierList = document.getElementById("panierList");
+    const unitsContainer = document.getElementById("unitsContainer");
+
+    // Génère les boutons “+ Service”
+    function renderServiceButtons() {
+      servicesPicker.innerHTML = "";
+      SERVICES.forEach(s => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "add-service";
+        btn.dataset.service = s.key;
+        btn.textContent = `+ ${s.label}`;
+        btn.addEventListener("click", () => addUnit(s.key, s.label));
+        servicesPicker.appendChild(btn);
+      });
+    }
+
+    function addUnit(serviceKey, serviceLabel) {
+      const id = ++unitSeq;
+      // État
+      state.units.push({
+        id, serviceKey, serviceLabel,
+        fields: { creneaux: "", duree: "", jours: [], commentaires: "" }
+      });
+
+      // Panier chip
+      const chip = document.createElement("div");
+      chip.className = "panier-chip";
+      chip.id = `chip-${id}`;
+      chip.textContent = `${serviceLabel} #${id}`;
+      chip.title = "Cliquer pour supprimer";
+      chip.addEventListener("click", () => removeUnit(id));
+      panierList.appendChild(chip);
+
+      // Formulaire unité
+      unitsContainer.appendChild(renderUnitCard(id, serviceKey, serviceLabel));
+
+      // Émettre hauteur (si iFrame)
+      postHeight();
+    }
+
+    function removeUnit(id) {
+      // État
+      state.units = state.units.filter(u => u.id !== id);
+      // UI
+      const chip = document.getElementById(`chip-${id}`);
+      if (chip) chip.remove();
+      const card = document.getElementById(`unit-${id}`);
+      if (card) card.remove();
+      postHeight();
+    }
+
+    function renderUnitCard(id, serviceKey, serviceLabel) {
+      const card = document.createElement("div");
+      card.className = "unit-card";
+      card.id = `unit-${id}`;
+      card.innerHTML = `
+        <div class="unit-header">
+          <div class="unit-title">${serviceLabel} #${id}</div>
+          <button type="button" class="unit-remove" aria-label="Supprimer">✕</button>
+        </div>
+        <div class="unit-grid">
+          <div>
+            <div class="text-block-192">Nombre de créneaux par semaine</div>
+            <input type="number" min="0" class="name w-input" placeholder="1" data-field="creneaux">
+          </div>
+          <div>
+            <div class="text-block-192">Durée moyenne d'un créneau</div>
+            <input type="text" class="name w-input" placeholder="1h30" data-field="duree">
+          </div>
+        </div>
+        <div class="nometab">
+          <div class="text-block-192">Jours de la semaine souhaités</div>
+          <div class="days-wrap">
+            ${JOURS.map(j => `
+              <label class="w-checkbox">
+                <input type="checkbox" class="w-checkbox-input" data-field="jour" value="${j}">
+                <span class="w-form-label">${j}</span>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+        <div class="nometab">
+          <div class="text-block-192">Commentaires</div>
+          <textarea class="textarea-10 w-input" placeholder="Votre précision (ex: niveau, effectif…)" data-field="commentaires"></textarea>
+        </div>
+      `;
+
+      // remove button
+      card.querySelector(".unit-remove").addEventListener("click", () => removeUnit(id));
+
+      // field bindings
+      card.querySelectorAll("[data-field]").forEach(el => {
+        const field = el.getAttribute("data-field");
+        if (field === "jour") {
+          el.addEventListener("change", () => {
+            const unit = state.units.find(u => u.id === id);
+            if (!unit) return;
+            const checked = Array.from(card.querySelectorAll('input[data-field="jour"]:checked')).map(i => i.value);
+            unit.fields.jours = checked;
+          });
+        } else {
+          el.addEventListener("input", () => {
+            const unit = state.units.find(u => u.id === id);
+            if (!unit) return;
+            unit.fields[field] = el.value;
+          });
+        }
+      });
+
+      return card;
+    }
+
+    renderServiceButtons();
+
+    /* ========= Soumission ========= */
+    const form = document.getElementById("wf-form-Formulaire-de-devis-Le-Kompa");
+    const successBox = document.getElementById("formSuccess");
+    const failBox = document.getElementById("formFail");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      failBox.style.display = "none";
+
+      // Gather lead fields
+      const civilite = (form.querySelector('input[name="Civilite"]:checked') || {}).value || "";
+      const prenom = (form.querySelector('[name="Prenom"]') || {}).value || "";
+      const nom = (form.querySelector('[name="Nom"]') || {}).value || "";
+      const email = (form.querySelector('[name="Email"]') || {}).value || "";
+      const telephone = (form.querySelector('[name="Telephone"]') || {}).value || "";
+      const etablissement = (form.querySelector('[name="Etablissement"]') || {}).value || "";
+      const codePostal = (form.querySelector('[name="CodePostal"]') || {}).value || "";
+
+      const types = Array.from(form.querySelectorAll('input[name="TypeEtab"]:checked')).map(i => i.value);
+
+      // Units payload
+      const servicesPayload = state.units.map(u => ({
+        id: u.id,
+        service_key: u.serviceKey,
+        service_label: u.serviceLabel,
+        creneaux_par_semaine: u.fields.creneaux,
+        duree_par_creneau: u.fields.duree,
+        jours: u.fields.jours,
+        commentaires: u.fields.commentaires
+      }));
+
+      const payload = {
+        civilite, prenom, nom, email, telephone,
+        etablissement, code_postal: codePostal,
+        type_etablissement: types,
+        services: servicesPayload,
+        page_url: window.location.href,
+        page_referrer: document.referrer || ""
+      };
+
+      // Envoi JSON → Airtable Webhook
+      try {
+        const resp = await fetch(AIRTABLE_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+
+        // Succès : masquer le form, afficher message
+        form.style.display = "none";
+        successBox.style.display = "block";
+        postHeight();
+
+      } catch (err) {
+        failBox.style.display = "block";
+        console.error(err);
+      }
+    });
+
+    /* ========= (Optionnel) Auto-resize si embed en iFrame ========= */
+    function postHeight() {
+      const h = Math.ceil(document.documentElement.scrollHeight);
+      if (window.parent) {
+        window.parent.postMessage({ type: "eddmon-form-height", height: h }, "*");
+      }
+    }
+    new ResizeObserver(postHeight).observe(document.body);
+    window.addEventListener("load", postHeight);
+  </script>
+</body>
+</html>
